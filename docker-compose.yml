@@ -1,6 +1,6 @@
 services:
   vibe-kanban:
-    build: .
+    image: liukunup/vibe-kanban:latest
     container_name: vibe-kanban
     restart: unless-stopped
     ports:

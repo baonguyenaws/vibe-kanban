@@ -1,0 +1,94 @@
+# 使用 Ubuntu 作为基础镜像
+ARG UBUNTU_VERSION=noble
+FROM ubuntu:$UBUNTU_VERSION
+
+
+# ----- 基础配置 -----
+
+# 避免交互式安装提示 & 设置时区 & 设置 Node.js 生产环境
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Asia/Shanghai \
+    NODE_ENV=production
+
+# 安装常用的命令行工具
+RUN apt-get update && apt-get install -y \
+    vim \
+    git \
+    curl \
+    wget \
+    gnupg \
+    unzip \
+    tree \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Node.js
+ARG NODE_VERSION=22.x
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Docker CLI
+RUN apt-get update && apt-get install -y ca-certificates curl && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    echo "Types: deb" > /etc/apt/sources.list.d/docker.sources && \
+    echo "URIs: https://download.docker.com/linux/ubuntu" >> /etc/apt/sources.list.d/docker.sources && \
+    echo "Suites: $(. /etc/os-release && echo ${UBUNTU_CODENAME:-$VERSION_CODENAME})" >> /etc/apt/sources.list.d/docker.sources && \
+    echo "Components: stable" >> /etc/apt/sources.list.d/docker.sources && \
+    echo "Signed-By: /etc/apt/keyrings/docker.asc" >> /etc/apt/sources.list.d/docker.sources && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin && \
+    rm -rf /var/lib/apt/lists/*
+
+# 安装 GitHub CLI
+RUN mkdir -p -m 755 /etc/apt/keyrings && \
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+    chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y gh && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# ----- 安装 Supported Coding Agents -----
+
+# 安装 npm 包形式的 agents
+RUN npm install -g \
+     vibe-kanban \
+    @anthropic-ai/claude-code \
+    @openai/codex \
+    @github/copilot \
+    @google/gemini-cli \
+    @sourcegraph/amp \
+     opencode-ai \
+    @musistudio/claude-code-router ui \
+    @qwen-code/qwen-code
+
+# 安装 Cursor Agent CLI
+RUN curl https://cursor.com/install -fsS | bash && \
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && \
+    ln -sf "$HOME/.local/bin/cursor-agent" /usr/local/bin/cursor-agent
+
+# 安装 Factory Droid
+RUN curl -fsSL https://app.factory.ai/cli | sh
+
+
+# ----- 健康检查 -----
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=15s \
+    CMD curl -f http://localhost:8080/ || exit 1
+
+
+# ----- 启动服务 -----
+
+# 设置工作目录
+WORKDIR /projects
+
+# 设置监听地址和端口
+ENV HOST=0.0.0.0 PORT=8080
+
+# 暴露端口
+EXPOSE 8080
+
+# 启动命令
+CMD ["npx", "vibe-kanban"]

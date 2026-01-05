@@ -37,6 +37,8 @@ clean: stop
 	@if [ -n "$$(docker ps -aq -f name=^/$(CONTAINER_NAME)$$)" ]; then \
 		echo "Removing container..."; \
 		docker rm $(CONTAINER_NAME); \
+		echo "Removing volume..."; \
+		docker volume rm vibe-kanban-npm-cache || true; \
 	else \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	fi

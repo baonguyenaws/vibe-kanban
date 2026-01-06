@@ -4,6 +4,7 @@ IMAGE_NAME = vibe-kanban:dev
 CONTAINER_NAME = vibe-kanban-dev
 PORT = 8080
 
+# 显示帮助信息
 .PHONY: help
 help:
 	@echo "Usage: make [target]"
@@ -16,10 +17,25 @@ help:
 	@echo "  logs        Follow container logs"
 	@echo "  shell       Enter the container shell"
 
+# 构建镜像
 .PHONY: build
 build:
-	docker build -t $(IMAGE_NAME) .
+	@echo "Select Dockerfile to build:"
+	@echo "1) Dockerfile.node"
+	@echo "2) Dockerfile.ubuntu"
+	@read -p "Enter choice [1-2]: " choice; \
+	if [ "$$choice" = "1" ]; then \
+		DOCKERFILE="Dockerfile.node"; \
+	elif [ "$$choice" = "2" ]; then \
+		DOCKERFILE="Dockerfile.ubuntu"; \
+	else \
+		echo "Invalid choice"; \
+		exit 1; \
+	fi; \
+	echo "Building using $$DOCKERFILE..."; \
+	docker build -f $$DOCKERFILE -t $(IMAGE_NAME) .
 
+# 运行容器
 .PHONY: run
 run: clean
 	@echo "Starting container $(CONTAINER_NAME)..."
@@ -32,6 +48,7 @@ run: clean
 		$(IMAGE_NAME)
 	@echo "Container started on http://localhost:$(PORT)"
 
+# 停止并移除容器及相关卷
 .PHONY: clean
 clean: stop
 	@if [ -n "$$(docker ps -aq -f name=^/$(CONTAINER_NAME)$$)" ]; then \
@@ -43,6 +60,7 @@ clean: stop
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	fi
 
+# 停止正在运行的容器
 .PHONY: stop
 stop:
 	@if [ -n "$$(docker ps -q -f name=^/$(CONTAINER_NAME)$$)" ]; then \
@@ -52,6 +70,7 @@ stop:
 		echo "Container $(CONTAINER_NAME) is not running."; \
 	fi
 
+# 查看容器日志
 .PHONY: logs
 logs:
 	@if [ -n "$$(docker ps -aq -f name=^/$(CONTAINER_NAME)$$)" ]; then \
@@ -60,6 +79,7 @@ logs:
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	fi
 
+# 进入容器的 shell 环境
 .PHONY: shell
 shell:
 	@if [ -n "$$(docker ps -q -f name=^/$(CONTAINER_NAME)$$)" ]; then \

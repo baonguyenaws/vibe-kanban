@@ -43,6 +43,16 @@ services:
       # macOS/Linux 路径通常是 ~/.config/gh
       # - ${HOME}/.config/gh:/root/.config/gh
 
+      # --- Docker 配置挂载 (可选) ---
+      # 如果你希望在容器内使用 Docker CLI 操作宿主机的 Docker
+      # 请取消注释以挂载 Docker Socket
+      # - /var/run/docker.sock:/var/run/docker.sock
+
+      # --- .copilot 配置挂载 (可选) ---
+      # 如果你在宿主机上使用 GitHub Copilot CLI 并配置了
+      # ~/.config/copilot 目录, 可以将其挂载到容器内以共享设置
+      # - ${HOME}/.config/copilot:/root/.config/copilot:ro
+
       # --- 缓存挂载 (可选) ---
       # 持久化 npm 缓存, 加快依赖安装和启动速度
       - npm-cache:/root/.npm

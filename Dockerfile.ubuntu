@@ -5,7 +5,7 @@ FROM ubuntu:$UBUNTU_VERSION
 
 # ----- 基础配置 -----
 
-# 避免交互式安装提示 & 设置时区 & 设置 Node.js 生产环境
+# 避免交互式安装提示 & 设置时区 & 设置生产环境标识
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=Asia/Shanghai \
     NODE_ENV=production
@@ -15,10 +15,7 @@ RUN apt-get update && apt-get install -y \
     vim \
     git \
     curl \
-    wget \
     gnupg \
-    unzip \
-    tree \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 Node.js
@@ -63,7 +60,8 @@ RUN npm install -g \
     @sourcegraph/amp \
      opencode-ai \
     @musistudio/claude-code-router ui \
-    @qwen-code/qwen-code
+    @qwen-code/qwen-code \
+    && npm cache clean --force
 
 # 安装 Cursor Agent CLI
 RUN curl https://cursor.com/install -fsS | bash && \

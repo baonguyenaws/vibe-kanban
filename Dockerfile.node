@@ -30,7 +30,6 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
 
 # 安装 npm 包形式的 agents
 RUN npm install -g \
-     vibe-kanban \
     @anthropic-ai/claude-code \
     @openai/codex \
     @github/copilot \

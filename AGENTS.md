@@ -39,7 +39,7 @@
 
 ### 常用操作
 - **停止容器**: `make stop` (仅停止，不删除容器)
-- **清理环境**: `make clean` (停止并删除容器，**同时删除** `vibe-kanban-npm-cache` 卷)
+- **清理环境**: `make clean` (停止并删除容器，**同时删除** `vk-data` And `vk-bin` 卷)
 - **查看日志**: `make logs`
 - **进入容器**: `make shell`
 

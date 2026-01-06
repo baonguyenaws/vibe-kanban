@@ -24,38 +24,42 @@ services:
       # - GIT_COMMITTER_EMAIL=your@email.com
     volumes:
       # --- [重要] 项目目录挂载 ---
-      # 将宿主机的代码目录挂载到容器内的 /projects
+      # 将宿主机的代码目录挂载到容器内的 /projects 目录下
       # 请根据您的操作系统选择合适的配置并取消注释
       # MacOS / Linux
       # - ${HOME}/Documents/projects:/projects
       # Windows
       # - C:/Users/YourUserName/Documents/projects:/projects
 
-      # --- Git/SSH 配置挂载 (可选, 用于操作私有仓库) ---
+      # --- SSH (可选) ---
       # 挂载 SSH 密钥 (只读), 以便容器可以访问 GitHub/GitLab 等私有仓库
       # - ${HOME}/.ssh:/root/.ssh:ro
 
-      # 挂载宿主机的 Git 全局配置 (只读), 共享用户名、邮箱等设置
+      # --- Git (只读) ---
+      # 挂载 Git 配置文件 (只读), 以便容器内共享用户名和邮箱等设置
       # - ${HOME}/.gitconfig:/root/.gitconfig:ro
 
-      # 挂载 GitHub CLI 配置 (可选)
+      # --- GitHub CLI (可选) ---
       # 如果你在宿主机已经登录了 gh 命令行工具, 挂载后容器内可直接使用
       # macOS/Linux 路径通常是 ~/.config/gh
       # - ${HOME}/.config/gh:/root/.config/gh
 
-      # --- Docker 配置挂载 (可选) ---
+      # --- GitHub Copilot (可选) ---
+      # 如果你在宿主机已经登录了 GitHub Copilot, 挂载后容器内可直接使用
+      # macOS/Linux 路径通常是 ~/.copilot
+      # - ${HOME}/.copilot:/root/.copilot
+
+      # --- Docker Socket (可选) ---
       # 如果你希望在容器内使用 Docker CLI 操作宿主机的 Docker
-      # 请取消注释以挂载 Docker Socket
+      # 请取消注释以挂载
       # - /var/run/docker.sock:/var/run/docker.sock
 
-      # --- 缓存挂载 (可选) ---
-      # 挂载缓存卷以持久化存储 Vibe Kanban 数据和 AI Coding 配置
+      # --- 缓存 (可选但推荐) ---
+      # 挂载缓存卷以持久化存储 Vibe Kanban 数据和配置
       # 这样即使重建容器, 数据和配置也不会丢失
-      - cache-local-share:/root/.local/share/vibe-kanban
-      - cache-vibe-kanban:/root/.vibe-kanban
-      - cache-copilot:/root/.copilot
+      - vk-data:/root/.local/share/vibe-kanban
+      - vk-bin:/root/.vibe-kanban
 
 volumes:
-  cache-local-share:
-  cache-vibe-kanban:
-  cache-copilot:
+  vk-data:
+  vk-bin:

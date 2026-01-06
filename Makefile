@@ -44,9 +44,8 @@ run: clean
 		--restart unless-stopped \
 		-p $(PORT):8080 \
 		-e TZ=Asia/Shanghai \
-		-v cache-local-share:/root/.local/share/vibe-kanban \
-		-v cache-vibe-kanban:/root/.vibe-kanban \
-		-v cache-copilot:/root/.copilot \
+		-v vk-data:/root/.local/share/vibe-kanban \
+		-v vk-bin:/root/.vibe-kanban \
 		$(IMAGE_NAME)
 	@echo "Container started on http://127.0.0.1:$(PORT)"
 
@@ -57,9 +56,8 @@ clean: stop
 		echo "Removing container..."; \
 		docker rm $(CONTAINER_NAME); \
 		echo "Removing volume..."; \
-		docker volume rm cache-local-share || true; \
-		docker volume rm cache-vibe-kanban || true; \
-		docker volume rm cache-copilot || true; \
+		docker volume rm vk-data || true; \
+		docker volume rm vk-bin || true; \
 	else \
 		echo "Container $(CONTAINER_NAME) does not exist."; \
 	fi

@@ -1,6 +1,6 @@
 # Vibe Kanban in Docker
 
-这个项目提供了一个 Docker 环境来运行 [Vibe Kanban](https://www.vibekanban.com/)。
+这个项目提供了一个便捷的 Docker 环境来运行 [Vibe Kanban](https://www.vibekanban.com/)。你可以直接使用预构建的镜像，也可以自己构建。
 
 ## 前置条件
 
@@ -23,9 +23,10 @@
       # - C:/Users/YourUserName/Documents/projects:/projects
     ```
 
-3.  **构建并启动容器**
+3.  **启动容器**
 
     ```bash
+    # 这将自动拉取 liukunup/vibe-kanban:latest 镜像并启动
     docker-compose up -d
     ```
 
@@ -44,11 +45,23 @@
 
 为了让 Vibe Kanban 能够进行 Git 操作和 GitHub 集成，你可以配置以下挂载（在 `docker-compose.yml` 中取消注释）：
 
-- **SSH 密钥**: `${HOME}/.ssh` -> `/root/.ssh` (只读)
-- **Git 配置**: `${HOME}/.gitconfig` -> `/root/.gitconfig` (只读)
-- **GitHub CLI 配置**: `${HOME}/.config/gh` -> `/root/.config/gh`
+- **SSH 密钥**: `${HOME}/.ssh` -> `/root/.ssh` (只读) - 用于 SSH 协议克隆/推送
+- **Git 配置**: `${HOME}/.gitconfig` -> `/root/.gitconfig` (只读) - 用于共享 Git 用户名/邮箱配置
+- **GitHub CLI 配置**: `${HOME}/.config/gh` -> `/root/.config/gh` - 用于 GitHub 登录状态
+- **GitHub Copilot 配置**: `${HOME}/.copilot` -> `/root/.copilot` (可能因系统而异) - 用于 Copilot 认证
 
 这意味着如果你在宿主机上已经配置好了 Git 和 GitHub CLI (`gh auth login`)，容器内将自动继承这些认证状态。
+
+### Docker Socket (可选)
+
+如果你希望在 Vibe Kanban 中使用 Docker 功能（例如管理其他容器），可以挂载 Docker Socket：
+- `/var/run/docker.sock` -> `/var/run/docker.sock`
+
+### 数据持久化
+
+容器使用两个 Docker 命名卷来持久化数据，即使删除容器数据也不会丢失：
+- `vk-data`: 挂载到 `/root/.local/share/vibe-kanban` (应用数据)
+- `vk-bin`: 挂载到 `/root/.vibe-kanban` (二进制文件缓存)
 
 ### 端口
 
@@ -71,6 +84,8 @@ environment:
   # Git 用户配置 (如果没有挂载 .gitconfig)
   # - GIT_AUTHOR_NAME=Your Name
   # - GIT_AUTHOR_EMAIL=your@email.com
+  # - GIT_COMMITTER_NAME=Your Name
+  # - GIT_COMMITTER_EMAIL=your@email.com
 ```
 
 ## 常见问题

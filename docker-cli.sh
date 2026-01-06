@@ -14,7 +14,9 @@ docker run -d \
   --restart unless-stopped \
   -p 8080:8080 \
   -e TZ=Asia/Shanghai \
-  -v vibe-kanban-npm-cache:/root/.npm \
+  -v cache-local-share:/root/.local/share/vibe-kanban \
+  -v cache-vibe-kanban:/root/.vibe-kanban \
+  -v cache-copilot:/root/.copilot \
   $IMAGE_NAME
 
   # --- 可选配置 (请手动添加到上面的命令中) ---
